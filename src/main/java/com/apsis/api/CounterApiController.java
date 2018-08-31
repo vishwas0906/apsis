@@ -5,6 +5,8 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.api.CounterApi;
 import io.swagger.model.Counter;
 import io.swagger.model.Error;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +21,8 @@ import java.util.Optional;
 @RestController
 public class CounterApiController implements CounterApi {
 
+    static final Logger log = LoggerFactory.getLogger(CounterApiController.class);
+
     private List<Counter> counters;
     private CounterService counterService;
 
@@ -31,11 +35,14 @@ public class CounterApiController implements CounterApi {
     @Override
     public ResponseEntity createCounter(@RequestBody final Counter counter) {
         if (StringUtils.isEmpty(counter.getName())) {
+            log.error("Invalid or empty name");
             return new ResponseEntity<>(new Error().message("Name can not be empty").code(HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
         }
         if (counterService.find(counter.getName()).isPresent()) {
+            log.error("Name is already taken {}", counter.getName());
             return new ResponseEntity<>(new Error().message("Name already taken" + counter.getName()).code(HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
         }
+        log.info("Counter created {}", counter.getName());
         return new ResponseEntity<>(counterService.save(counter), HttpStatus.CREATED);
     }
 
