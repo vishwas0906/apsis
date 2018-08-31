@@ -21,7 +21,7 @@ import java.util.Optional;
 @RestController
 public class CounterApiController implements CounterApi {
 
-    static final Logger log = LoggerFactory.getLogger(CounterApiController.class);
+    private static final Logger log = LoggerFactory.getLogger(CounterApiController.class);
 
     private List<Counter> counters;
     private CounterService counterService;
@@ -40,7 +40,7 @@ public class CounterApiController implements CounterApi {
         }
         if (counterService.find(counter.getName()).isPresent()) {
             log.error("Name is already taken {}", counter.getName());
-            return new ResponseEntity<>(new Error().message("Name already taken" + counter.getName()).code(HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new Error().message("Name already taken " + counter.getName()).code(HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
         }
         log.info("Counter created {}", counter.getName());
         return new ResponseEntity<>(counterService.save(counter), HttpStatus.CREATED);
@@ -54,10 +54,7 @@ public class CounterApiController implements CounterApi {
     @Override
     public ResponseEntity getCounter(@ApiParam(value = "name of counter", required = true) @PathVariable("counterName") String name) {
         Optional<Counter> counter = counterService.increment(name);
-        if (counter.isPresent()) {
-            return new ResponseEntity<>(counter.get(), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(new Error().message(name + " Not found").code(HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
-        }
+        return counter.<ResponseEntity>map(c1 -> new ResponseEntity<>(c1, HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(new Error().message(name + " Not found").code(HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST));
     }
 }
