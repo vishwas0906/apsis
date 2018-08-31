@@ -1,0 +1,103 @@
+swagger: '3.0' #version of Swagger
+info: # High Level information of API
+  description: APSIS demo #Give the description of API
+  version: 1.0.0 #API version
+  title: Swagger APSIS Demo # API title
+  license: #Swagger license info
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+host: localhost # Host Name
+basePath: /v1 #Basepath when there are multiple versions of API running
+tags: # Tag information for each API operation. Multiple tags for multiple API operation
+  - name: counter #Tag name
+schemes:
+  - http #security schemes
+paths:
+  '/counter/{counterName}': #Request Mapping path of REST API
+    get: #Request method type, GET,POST etc.
+      tags: # Refer to created tag above
+        - counter
+      summary: Find counter by name #Summary
+      description: Returns a single Counter #Description of API operation
+      operationId: getCounter #Method name
+      produces:
+        - application/json #Response content type
+      parameters:
+        - name: counterName #Input parameter
+          in: path #path variable
+          description: name of counter #description of parameter
+          required: true #Is mandatory
+          type: string #data type
+      responses: # API response
+        '200': #Successful status code
+          description: successful operation #Successful status description
+          schema:
+            $ref: '#/definitions/Counter' #Response object details
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  '/counter':
+    post:
+      summary: Create counter
+      operationId: createCounter
+      tags:
+        - counter
+      produces:
+        - application/json #Response content type
+      parameters:
+        - name: "counter"
+          in: "body"
+          description: "New counter"
+          required: true
+          schema:
+            $ref: "#/definitions/Counter"
+      responses:
+        '201': #Successful status code
+          description: successful operation #Successful status description
+          schema:
+            $ref: '#/definitions/Counter' #Response object details
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    get:
+      summary: Get all counters
+      operationId: getAllCounters
+      tags:
+        - counter
+      produces:
+        - application/json #Response content type
+      responses:
+        "200":
+          description: "Counter response"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Counter"
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+definitions: # Object definition
+  Counter: #Employee Object
+    type: object
+    required:
+      - name
+    properties: #Object properties
+      name: #name attribute
+        type: string
+      count: #count attribute
+        type: integer
+        format: int64
+  Error:
+    type: object
+    required:
+      - code
+      - message
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
