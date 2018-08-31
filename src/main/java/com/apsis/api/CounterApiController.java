@@ -53,6 +53,13 @@ public class CounterApiController implements CounterApi {
 
     @Override
     public ResponseEntity getCounter(@ApiParam(value = "name of counter", required = true) @PathVariable("counterName") String name) {
+        Optional<Counter> counter = counterService.find(name);
+        return counter.<ResponseEntity>map(c1 -> new ResponseEntity<>(c1, HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(new Error().message(name + " Not found").code(HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST));
+    }
+
+    @Override
+    public ResponseEntity<Counter> increment(@PathVariable("counterName") String name) {
         Optional<Counter> counter = counterService.increment(name);
         return counter.<ResponseEntity>map(c1 -> new ResponseEntity<>(c1, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(new Error().message(name + " Not found").code(HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST));

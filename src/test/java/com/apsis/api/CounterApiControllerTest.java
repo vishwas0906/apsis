@@ -26,9 +26,9 @@ public class CounterApiControllerTest {
     @LocalServerPort
     private int port;
 
-    TestRestTemplate restTemplate = new TestRestTemplate();
+    private TestRestTemplate restTemplate = new TestRestTemplate();
 
-    HttpHeaders headers = new HttpHeaders();
+    private HttpHeaders headers = new HttpHeaders();
 
     @Before
     public void init() {
@@ -41,6 +41,19 @@ public class CounterApiControllerTest {
         invoke(entityC1, HttpMethod.POST, "/v1/counter");
         invoke(entityC2, HttpMethod.POST, "/v1/counter");
         invoke(entityC3, HttpMethod.POST, "/v1/counter");
+    }
+
+    @Test
+    public void increment() throws JSONException {
+        Counter c4 = new Counter().name("C4");
+        HttpEntity<Counter> entityC1 = new HttpEntity<>(c4, headers);
+        invoke(entityC1, HttpMethod.POST, "/v1/counter");
+
+        ResponseEntity<String> get = invoke(null, HttpMethod.PUT, "/v1/counter/C4");
+        String expectedGet = "{name:C4,count:1}";
+
+        JSONAssert.assertEquals(expectedGet, get.getBody(), false);
+
     }
 
     @Test
@@ -68,9 +81,21 @@ public class CounterApiControllerTest {
 
     @Test
     public void getCounter() throws JSONException {
-
         ResponseEntity<String> get = invoke(null, HttpMethod.GET, "/v1/counter/C3");
-        String expectedGet = "{name:C3,count:1}";
+        String expectedGet = "{name:C3,count:0}";
+
+        JSONAssert.assertEquals(expectedGet, get.getBody(), false);
+
+    }
+
+    @Test
+    public void getCounterManyTimes() throws JSONException {
+        invoke(null, HttpMethod.GET, "/v1/counter/C3");
+        invoke(null, HttpMethod.GET, "/v1/counter/C3");
+        invoke(null, HttpMethod.GET, "/v1/counter/C3");
+        invoke(null, HttpMethod.GET, "/v1/counter/C3");
+        ResponseEntity<String> get = invoke(null, HttpMethod.GET, "/v1/counter/C3");
+        String expectedGet = "{name:C3,count:0}";
 
         JSONAssert.assertEquals(expectedGet, get.getBody(), false);
 
@@ -80,7 +105,7 @@ public class CounterApiControllerTest {
     public void getAllCounter() throws JSONException {
         ResponseEntity<String> get = invoke(null, HttpMethod.GET, "/v1/counter");
 
-        String expected = "[{name:C1,count:0},{name:C2,count:0},{name:C3,count:1}]";
+        String expected = "[{name:C1,count:0},{name:C2,count:0},{name:C3,count:0},{name:C4,count:1}]";
 
         JSONAssert.assertEquals(expected, get.getBody(), false);
     }

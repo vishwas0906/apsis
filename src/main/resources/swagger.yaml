@@ -37,6 +37,29 @@ paths:
           description: unexpected error
           schema:
             $ref: '#/definitions/Error'
+    put: #Request method type, GET,POST etc.
+      tags: # Refer to created tag above
+        - counter
+      summary: Increment given counter by one #Summary
+      description: Returns updated Counter #Description of API operation
+      operationId: increment #Method name
+      produces:
+        - application/json #Response content type
+      parameters:
+        - name: counterName #Input parameter
+          in: path #path variable
+          description: name of counter #description of parameter
+          required: true #Is mandatory
+          type: string #data type
+      responses: # API response
+        '200': #Successful status code
+          description: successful operation #Successful status description
+          schema:
+            $ref: '#/definitions/Counter' #Response object details
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
   '/counter':
     post:
       summary: Create counter
