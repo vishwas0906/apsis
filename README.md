@@ -4,10 +4,10 @@ Swagger file for this project can be found at resources/swagger.yaml.
 ## Build
 mvn clean package
 
-##Test
+## Test
 mvn clean verify
 
-##Run
+## Run
 mvn spring-boot:run
 
 
