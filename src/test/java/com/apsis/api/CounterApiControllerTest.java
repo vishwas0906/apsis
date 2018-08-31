@@ -46,8 +46,11 @@ public class CounterApiControllerTest {
     @Test
     public void increment() throws JSONException {
         Counter c4 = new Counter().name("C4");
-        HttpEntity<Counter> entityC1 = new HttpEntity<>(c4, headers);
-        invoke(entityC1, HttpMethod.POST, "/v1/counter");
+        HttpEntity<Counter> entityC4 = new HttpEntity<>(c4, headers);
+        ResponseEntity<String> post = invoke(entityC4, HttpMethod.POST, "/v1/counter");
+        String expectedPost = "{name:C4,count:0}";
+
+        JSONAssert.assertEquals(expectedPost, post.getBody(), false);
 
         ResponseEntity<String> get = invoke(null, HttpMethod.PUT, "/v1/counter/C4");
         String expectedGet = "{name:C4,count:1}";
